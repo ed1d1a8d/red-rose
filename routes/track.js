@@ -1,3 +1,4 @@
+//TODO: switch to AWS DynamoDB
 var express = require("express");
 var router = express.Router();
 var pg = require("pg");
