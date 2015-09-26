@@ -1,2 +1,2 @@
 # red-rose
-Personal website written in node.
+Personal website written built on nodejs.
