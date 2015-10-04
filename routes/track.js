@@ -1,69 +1,168 @@
-//TODO: switch to AWS DynamoDB
-var express = require("express");
+var express = require('express');
 var router = express.Router();
-var pg = require("pg");
-var conString = "postgres://localhost:5432/track";
+var awscred = require('awscred');
+var dynamodb = require('dynamodb');
+var path = require('path');
 
-router.post("/register", function(req, res) {
-    var results = [];
-    var data = {handle: req.body.handle, score: 0};
-    console.log(req.body);
-
-    pg.connect(conString, function(err, client, done) {
-        var handleError = function(err) {
-            if (!err) return false;
-            if (client) {
-                done(client);
-            }
-            res.writeHead(500, {"content-type": "text/plain"});
-            res.end("An error occurred");
-            return true;
-        };
-
-        if (handleError(err)) return;
-
-        client.query("INSERT INTO visitor (handle, score) VALUES ($1, $2)",
-            [data.handle, data.score],
-            function(err, result) {
-                if (handleError(err)) return;
-                done();
-                res.writeHead(200, {"content-type": "text/plain"});
-                res.end("Welcome " + data.handle + "! Your score is 0.");
-            });
-    });
+router.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname + '/../static/projects/track.html'));
 });
 
-router.get("/:handle", function(req, res) {
-    var handle = req.params.handle;
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+}
 
-    pg.connect(conString, function(err, client, done) {
-        var handleError = function(err, message) {
-            if (!err) return false;
-            if (client) {
-                done(client);
-            }
-            res.writeHead(500, {"content-type": "text/plain"});
-            res.end("An error occurred: " + message);
-            return true;
-        };
+function goodHandle(handle) {
+  return ( !isBlank(handle)
+            && /^[a-z]+$/.test(handle)
+            && handle.length <= 15 );
+}
 
-        if(handleError(err, "can't connect to database")) return;
+function verifyHandle(res, handle) { //true: valid, false: invalid
+  if (!goodHandle(handle)) {
+    res.writeHead(400, {'content-type': 'text/plain'});
+    res.end(
+      'Invalid handle format. '
+      + 'Handle must be lowercase and at most 15 characters.'
+    );
+    return false;
+  }
+  return true;
+}
 
-        client.query("SELECT score FROM visitor\
-            WHERE handle = ($1)", [handle],
-            function(err, result) {
-                if (handleError(err, "database query failed")) return;
-                done();
-                res.writeHead(200, {"content-type": "text/plain"});
-                if (!result.rows[0]) {
-                    res.end("Not tracking " + handle + 
-                        ". No score available." );
-                } else {
-                    res.end("Score of " + handle + 
-                        " is " + result.rows[0].score + ".");
-                }
-            });
+function handleError(err, res) {
+  if (!err) return false;
+  res.writeHead(500, {'content-type': 'text/plain'});
+  res.end('An error occurred: ' + err.message);
+  return true;
+}
+
+function checkExistence(ddb, handle, noExistCallback, yesExistCallback) {
+  ddb.getItem(
+    'track',
+    handle,
+    null,
+    {},
+    function(err, retItem, cap) {
+      if (!retItem) {
+        noExistCallback(err);
+      } else {
+        yesExistCallback(err, retItem);
+      }
+    }
+  );
+}
+
+router.post('/register', function(req, res) {
+  var item = {handle: req.body.handle, score: 0};
+  if (!verifyHandle(res, item.handle)) return;
+
+  awscred.load(function(err, data) {
+    if (handleError(err, res)) return;
+
+    ddb = dynamodb.ddb({
+      accessKeyId: data.credentials.accessKeyId,
+      secretAccessKey: data.credentials.secretAccessKey,
+      endpoint: 'dynamodb.us-west-2.amazonaws.com'
     });
+
+    checkExistence(
+      ddb,
+      item.handle,
+      function(err) {
+        if (handleError(err, res)) return;
+        ddb.putItem(
+          'track',
+          item,
+          {},
+          function(err, retItem, cap) {
+            if (handleError(err, res)) return;
+            console.log('Registered user: ' + item.handle);
+            res.writeHead(200, {'content-type': 'text/plain'});
+            res.end('Welcome ' + item.handle + '! Your score is 0.');
+          }
+        );
+      },
+      function(err, retItem) {
+        if (handleError(err, res)) return;
+        res.writeHead(400, {'content-type': 'text/plain'});
+        res.end(item.handle + ' has already been registered.');
+      }
+    );
+  });
+});
+
+router.get('/:handle', function(req, res) {
+  var handle = req.params.handle;
+  if (!verifyHandle(res, handle)) return;
+
+  awscred.load(function(err, data) {
+    if (handleError(err, res)) return;
+
+    ddb = dynamodb.ddb({
+      accessKeyId: data.credentials.accessKeyId,
+      secretAccessKey: data.credentials.secretAccessKey,
+      endpoint: 'dynamodb.us-west-2.amazonaws.com'
+    });
+
+    checkExistence(
+      ddb,
+      handle,
+      function(err) {
+        if (handleError(err, res)) return;
+        res.writeHead(400, {'content-type': 'text/plain'});
+        res.end(handle + ' is not a registered user.');
+      },
+      function(err, retItem) {
+        if (handleError(err, res)) return;
+        res.writeHead(200, {'content-type': 'text/plain'});
+        res.end('Score of ' + handle + ' is ' + retItem.score + '.');
+      }
+    );
+  });
+});
+
+router.get('/roll/:handle', function(req, res) {
+  var handle = req.params.handle;
+  if (!verifyHandle(res, handle)) return;
+
+  awscred.load(function(err, data) {
+    if (handleError(err, res)) return;
+
+    ddb = dynamodb.ddb({
+      accessKeyId: data.credentials.accessKeyId,
+      secretAccessKey: data.credentials.secretAccessKey,
+      endpoint: 'dynamodb.us-west-2.amazonaws.com'
+    });
+
+    checkExistence(
+      ddb,
+      handle,
+      function(err) {
+        if (handleError(err, res)) return;
+        res.writeHead(400, {'content-type': 'text/plain'});
+        res.end(handle + ' is not a registered user.');
+      },
+      function(err, retItem) {
+        if (handleError(err, res)) return;
+        var add = Math.floor((Math.random() * 13) + 1);
+        var newscore = retItem.score + add;
+        ddb.updateItem(
+          'track',
+          handle,
+          null,
+          { 'score': { value: newscore, action: 'PUT'} },
+          {},
+          function(err, retItem, cap) {
+            if (handleError(err, res)) return;
+            res.writeHead(200, {'content-type': 'text/plain'});
+            res.end(handle + ' gained ' + add + ' points. ' + handle + 
+              '\'s score is now ' + newscore + '.');
+          }
+        );
+      }
+    );
+  });
 });
 
 module.exports = router;
