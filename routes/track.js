@@ -63,6 +63,8 @@ router.post('/register', function(req, res) {
     ddb = dynamodb.ddb({
       accessKeyId: data.credentials.accessKeyId,
       secretAccessKey: data.credentials.secretAccessKey,
+      sessionToken: data.credentials.sessionToken,
+      sessionExpires: data.credentials.expiration,
       endpoint: 'dynamodb.us-west-2.amazonaws.com'
     });
 
@@ -102,6 +104,8 @@ router.get('/:handle', function(req, res) {
     ddb = dynamodb.ddb({
       accessKeyId: data.credentials.accessKeyId,
       secretAccessKey: data.credentials.secretAccessKey,
+      sessionToken: data.credentials.sessionToken,
+      sessionExpires: data.credentials.expiration,
       endpoint: 'dynamodb.us-west-2.amazonaws.com'
     });
 
@@ -132,6 +136,8 @@ router.get('/roll/:handle', function(req, res) {
     ddb = dynamodb.ddb({
       accessKeyId: data.credentials.accessKeyId,
       secretAccessKey: data.credentials.secretAccessKey,
+      sessionToken: data.credentials.sessionToken,
+      sessionExpires: data.credentials.expiration,
       endpoint: 'dynamodb.us-west-2.amazonaws.com'
     });
 
