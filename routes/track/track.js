@@ -3,13 +3,14 @@ var router = express.Router();
 var awscred = require('awscred');
 var dynamodb = require('dynamodb');
 var path = require('path');
+var config = require(path.join(__dirname + '/../../config'));
 
 router.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname + '/../static/projects/track.html'));
+  res.sendFile(path.join(__dirname + '/track.html'));
 });
 
 function isBlank(str) {
-    return (!str || /^\s*$/.test(str));
+  return (!str || /^\s*$/.test(str));
 }
 
 function goodHandle(handle) {
@@ -65,7 +66,7 @@ router.post('/register', function(req, res) {
       secretAccessKey: data.credentials.secretAccessKey,
       sessionToken: data.credentials.sessionToken,
       sessionExpires: data.credentials.expiration,
-      endpoint: 'dynamodb.us-west-2.amazonaws.com'
+      endpoint: config.track.ddb_endpoint
     });
 
     checkExistence(
@@ -94,7 +95,7 @@ router.post('/register', function(req, res) {
   });
 });
 
-router.get('/:handle', function(req, res) {
+router.get('/score/:handle', function(req, res) {
   var handle = req.params.handle;
   if (!verifyHandle(res, handle)) return;
 
@@ -106,7 +107,7 @@ router.get('/:handle', function(req, res) {
       secretAccessKey: data.credentials.secretAccessKey,
       sessionToken: data.credentials.sessionToken,
       sessionExpires: data.credentials.expiration,
-      endpoint: 'dynamodb.us-west-2.amazonaws.com'
+      endpoint: config.track.ddb_endpoint
     });
 
     checkExistence(
@@ -138,7 +139,7 @@ router.get('/roll/:handle', function(req, res) {
       secretAccessKey: data.credentials.secretAccessKey,
       sessionToken: data.credentials.sessionToken,
       sessionExpires: data.credentials.expiration,
-      endpoint: 'dynamodb.us-west-2.amazonaws.com'
+      endpoint: config.track.ddb_endpoint
     });
 
     checkExistence(

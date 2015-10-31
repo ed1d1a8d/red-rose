@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', express.static('static'));
 
 //routes
-app.use('/track', require('./routes/track'));
+app.use('/track', require('./routes/track/track'));
 
 //create server
 var http = require('http');
