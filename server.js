@@ -3,8 +3,10 @@ var fs = require('fs'),
     express = require('express'),
     app = express();
 
-var logger = require('morgan');
-app.use(logger('dev'));
+var morgan = require('morgan');
+if (app.get('env') != 'production') {
+  app.use(morgan('dev'));
+}
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
