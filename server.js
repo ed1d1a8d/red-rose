@@ -21,6 +21,7 @@ app.use('/robots.txt', express.static('static/public/robots.txt'));
 //routes
 app.use('/track', require('./routes/track/track'));
 app.use('/games', require('./routes/games/games'));
+app.use('/usaco', require('./routes/usaco/usaco'));
 
 //404 - File or directory not found
 app.use(function(req, res, next) {

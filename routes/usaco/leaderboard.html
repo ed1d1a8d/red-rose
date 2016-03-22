@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/default.css">
+    <title>USACO Leaderboard</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.2.0/list.min.js"></script>
+  </head>
+   
+  <body>
+    <h1 style="text-align:center"> USACO 2015-2016 Platinum Leaderboard </h1>
+
+    <div id="leaderboard">
+      <input class="search" data-search="name" placeholder="Search"/>
+      <button class="sort" data-sort="name">
+        Sort by name
+      </button>
+
+      <table>
+        <!-- IMPORTANT, class="list" have to be at tbody -->
+        <tbody class="list">
+          <tr>
+            <td class="rank">Loading Data...</td>
+            <td class="name"></td>
+            <td class="score"></td>
+          </tr>
+        </tbody>
+      </table>
+
+
+    </div>
+  </body>
+
+  <script src="/usaco/js/load.js"></script>
+  <script src="/usaco/js/leaderboard.js"></script>
+</html>
