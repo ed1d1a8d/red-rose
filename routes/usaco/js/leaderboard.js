@@ -11,18 +11,57 @@ function finishedLoad(e) {
 }
 
 function parseData(data) {
-  competitors = [{
-        name: "Jonny Strömberg",
-        score: 1000
-      },
-      {
-        name: "Jonas Arnklint",
-        score: 667
-      },
-      {
-        name: "Martina Elm",
-        score: 234
-  }];
+  var elements = $("<div/>").append(data).find("tr");
+  console.log(elements.length);
+
+  competitors = [];
+  for (var i = 0; i < elements.length; i++) {
+    var competitor = parseCompetitor(elements.eq(i));
+    if (competitor != null) {
+      competitors.push(competitor);
+    }
+  }
+}
+
+function parseCompetitor(element) {
+  var properties = element.find("td");
+
+  if (properties.length == 0) {
+    return null;
+  } else if (removeTags(properties[0].outerHTML) == "Country") {
+    return null;
+  }
+
+  var competitor = {};
+  competitor["country"] = removeTags(properties[0].outerHTML);
+
+  if (removeNonNumerics(properties[1].outerHTML) != "") {
+    competitor["year"] = parseInt(removeNonNumerics(properties[1].outerHTML));
+    competitor["name"] = removeTags(properties[2].outerHTML);
+    competitor["score"] = parseInt(removeTags(properties[3].outerHTML));
+  } else {
+    competitor["year"] = null;
+    competitor["name"] = removeTags(properties[1].outerHTML);
+    competitor["score"] = parseInt(removeTags(properties[2].outerHTML));
+  }
+
+  console.log(competitor.score);
+
+  return competitor;
+}
+
+function isNumeric(str) {
+  return !isNaN(str);
+}
+
+function removeNonNumerics(str) {
+  var ret = str.replace(/\D/g, "");
+  return ret;
+}
+
+function removeTags(str) {
+  var ret = str.replace(/<\/?[^>]+(>|$)/g, "");
+  return ret;
 }
 
 function processData() {
@@ -49,7 +88,7 @@ function processData() {
     competitors[i]["rank"] = currank;
     if (i + 1 < competitors.length) {
       if (competitors[i]["score"] > competitors[i + 1]["score"]) {
-        ++currank;
+        currank = i + 1;
       }
     }
   }
@@ -57,7 +96,7 @@ function processData() {
 
 function writeData() {
   var options = {
-    valueNames: [ "rank", "name", "score" ]
+    valueNames: [ "rank", "country", "year", "name", "score" ]
   };
   list = new List("leaderboard", options, competitors);
   list.remove("rank", "Loading Data...");
