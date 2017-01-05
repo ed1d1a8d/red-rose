@@ -15,7 +15,7 @@ function isBlank(str) {
 
 function goodHandle(handle) {
   return ( !isBlank(handle)
-            && /^[a-z,0-9]+$/.test(handle)
+            && /^[a-z0-9]+$/.test(handle)
             && handle.length <= 15 );
 }
 
