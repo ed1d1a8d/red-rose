@@ -15,7 +15,7 @@ function isBlank(str) {
 
 function goodHandle(handle) {
   return ( !isBlank(handle)
-            && /^[a-z]+$/.test(handle)
+            && /^[a-z,0-9]+$/.test(handle)
             && handle.length <= 15 );
 }
 
@@ -23,8 +23,8 @@ function verifyHandle(res, handle) { //true: valid, false: invalid
   if (!goodHandle(handle)) {
     res.writeHead(400, {'content-type': 'text/plain'});
     res.end(
-      'Invalid handle format. '
-      + 'Handle must be lowercase and at most 15 characters.'
+      'Invalid handle format. ' +
+      'Handle must be lowercase letters and numbers and at most 15 characters.'
     );
     return false;
   }
@@ -163,7 +163,7 @@ router.get('/roll/:handle', function(req, res) {
           function(err, retItem, cap) {
             if (handleError(err, res)) return;
             res.writeHead(200, {'content-type': 'text/plain'});
-            res.end(handle + ' gained ' + add + ' points. ' + handle + 
+            res.end(handle + ' gained ' + add + ' points. ' + handle +
               '\'s score is now ' + newscore + '.');
           }
         );

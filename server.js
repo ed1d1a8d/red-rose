@@ -49,7 +49,7 @@ app.use(function(error, req, res, next) {
 
 //create server
 https.createServer({
-  key: fs.readFileSync('.ssl/p256v1-private-test.key'),
-  cert: fs.readFileSync('.ssl/red-rose-test.crt'),
+  key: fs.readFileSync('.ssl/key.pem'),
+  cert: fs.readFileSync('.ssl/cert.pem'),
 }, app).listen(2222);
 console.log("https server listening on port 2222");
