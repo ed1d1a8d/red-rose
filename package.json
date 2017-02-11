@@ -1,14 +1,13 @@
 {
   "name": "red-rose",
   "version": "1.0.0",
-  "description": "tonynater's personal website",
+  "description": "ed1d1a8d's personal website",
   "main": "server.js",
   "dependencies": {
-    "awscred": "^1.1.0",
-    "body-parser": "^1.15.0",
+    "awscred": "^1.2.0",
+    "body-parser": "^1.16.0",
     "dynamodb": "^0.3.6",
-    "express": "^4.13.4",
-    "morgan": "^1.7.0"
+    "express": "^4.14.1",
   },
   "devDependencies": {},
   "scripts": {
@@ -17,12 +16,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tonynater/red-rose.git"
+    "url": "git+https://github.com/ed1d1a8d/red-rose.git"
   },
-  "author": "tonynater",
+  "author": "ed1d1a8d",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/tonynater/red-rose/issues"
+    "url": "https://github.com/ed1d1a8d/red-rose/issues"
   },
-  "homepage": "https://github.com/tonynater/red-rose#readme"
+  "homepage": "https://github.com/ed1d1a8d/red-rose#readme"
 }

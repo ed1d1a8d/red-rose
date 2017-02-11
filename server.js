@@ -2,11 +2,8 @@ var fs = require('fs'),
     https = require('https'),
     express = require('express'),
     app = express();
-
-var morgan = require('morgan');
-if (app.get('env') != 'production') {
-  app.use(morgan('dev'));
-}
+var path = require('path');
+var config = require(path.join(__dirname + '/config'));
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -49,7 +46,7 @@ app.use(function(error, req, res, next) {
 
 //create server
 https.createServer({
-  key: fs.readFileSync('.ssl/key.pem'),
-  cert: fs.readFileSync('.ssl/cert.pem'),
+  key: fs.readFileSync(config.ssl.root + 'privkey.pem'),
+  cert: fs.readFileSync(config.ssl.root + 'cert.pem'),
 }, app).listen(2222);
 console.log("https server listening on port 2222");

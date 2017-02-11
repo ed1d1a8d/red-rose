@@ -6,4 +6,7 @@ config.track.readcap = 5;
 config.track.writecap = 5;
 config.track.range_const = 0;
 
+config.ssl = {};
+config.ssl.root = '.ssl/';
+
 module.exports = config;
