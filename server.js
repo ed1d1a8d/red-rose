@@ -1,5 +1,4 @@
 var fs = require('fs'),
-    https = require('https'),
     express = require('express'),
     app = express();
 var path = require('path');
@@ -45,8 +44,5 @@ app.use(function(error, req, res, next) {
 });
 
 //create server
-https.createServer({
-  key: fs.readFileSync(config.ssl.root + 'privkey.pem'),
-  cert: fs.readFileSync(config.ssl.root + 'cert.pem'),
-}, app).listen(2222);
-console.log("https server listening on port 2222");
+app.listen(2222);
+console.log("Server listening on port 2222");
